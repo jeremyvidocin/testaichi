@@ -1,0 +1,128 @@
+<html>
+<head>
+<title>CommandeDAO.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #6aab73;}
+.s4 { color: #7a7e85;}
+.s5 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+CommandeDAO.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">model</span><span class="s2">;</span>
+
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">sql</span><span class="s2">.*;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">ArrayList</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">List</span><span class="s2">;</span>
+
+<span class="s0">public class </span><span class="s1">CommandeDAO </span><span class="s2">{</span>
+    <span class="s0">private </span><span class="s1">Connection connection</span><span class="s2">;</span>
+
+    <span class="s0">public </span><span class="s1">CommandeDAO</span><span class="s2">() {</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">connection </span><span class="s2">= </span><span class="s1">ConnexionDAO</span><span class="s2">.</span><span class="s1">getConnexion</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">List</span><span class="s2">&lt;</span><span class="s1">Commande</span><span class="s2">&gt; </span><span class="s1">getAllCommandes</span><span class="s2">() {</span>
+        <span class="s1">List</span><span class="s2">&lt;</span><span class="s1">Commande</span><span class="s2">&gt; </span><span class="s1">commandes </span><span class="s2">= </span><span class="s0">new </span><span class="s1">ArrayList</span><span class="s2">&lt;&gt;();</span>
+        <span class="s1">String query </span><span class="s2">= </span><span class="s3">&quot;SELECT * FROM commandes&quot;</span><span class="s2">;</span>
+
+        <span class="s0">try </span><span class="s2">(</span><span class="s1">Statement stmt </span><span class="s2">= </span><span class="s1">connection</span><span class="s2">.</span><span class="s1">createStatement</span><span class="s2">();</span>
+             <span class="s1">ResultSet rs </span><span class="s2">= </span><span class="s1">stmt</span><span class="s2">.</span><span class="s1">executeQuery</span><span class="s2">(</span><span class="s1">query</span><span class="s2">)) {</span>
+
+            <span class="s0">while </span><span class="s2">(</span><span class="s1">rs</span><span class="s2">.</span><span class="s1">next</span><span class="s2">()) {</span>
+                <span class="s1">commandes</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Commande</span><span class="s2">(</span>
+                        <span class="s1">rs</span><span class="s2">.</span><span class="s1">getInt</span><span class="s2">(</span><span class="s3">&quot;ID&quot;</span><span class="s2">),</span>
+                        <span class="s1">rs</span><span class="s2">.</span><span class="s1">getInt</span><span class="s2">(</span><span class="s3">&quot;ID_Client&quot;</span><span class="s2">),</span>
+                        <span class="s1">rs</span><span class="s2">.</span><span class="s1">getDate</span><span class="s2">(</span><span class="s3">&quot;Date&quot;</span><span class="s2">),</span>
+                        <span class="s1">rs</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s3">&quot;Statut&quot;</span><span class="s2">)</span>
+                <span class="s2">));</span>
+            <span class="s2">}</span>
+        <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">SQLException e</span><span class="s2">) {</span>
+            <span class="s1">e</span><span class="s2">.</span><span class="s1">printStackTrace</span><span class="s2">();</span>
+        <span class="s2">}</span>
+        <span class="s1">System</span><span class="s2">.</span><span class="s1">out</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s3">&quot;Nombre de commandes récupérées : &quot; </span><span class="s2">+ </span><span class="s1">commandes</span><span class="s2">.</span><span class="s1">size</span><span class="s2">()); </span><span class="s4">// Ajoutez ce message pour le débogage</span>
+        <span class="s0">return </span><span class="s1">commandes</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public boolean </span><span class="s1">addCommande</span><span class="s2">(</span><span class="s0">int </span><span class="s1">clientId</span><span class="s2">, </span><span class="s1">Date date</span><span class="s2">, </span><span class="s1">String statut</span><span class="s2">) {</span>
+        <span class="s1">String query </span><span class="s2">= </span><span class="s3">&quot;INSERT INTO commandes (Date, Statut, ID_Client) VALUES (?, ?, ?)&quot;</span><span class="s2">;</span>
+
+        <span class="s0">try </span><span class="s2">(</span><span class="s1">PreparedStatement stmt </span><span class="s2">= </span><span class="s1">connection</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s1">query</span><span class="s2">, </span><span class="s1">Statement</span><span class="s2">.</span><span class="s1">RETURN_GENERATED_KEYS</span><span class="s2">)) {</span>
+            <span class="s1">stmt</span><span class="s2">.</span><span class="s1">setDate</span><span class="s2">(</span><span class="s5">1</span><span class="s2">, </span><span class="s0">new </span><span class="s1">java</span><span class="s2">.</span><span class="s1">sql</span><span class="s2">.</span><span class="s1">Date</span><span class="s2">(</span><span class="s1">date</span><span class="s2">.</span><span class="s1">getTime</span><span class="s2">()));</span>
+            <span class="s1">stmt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s5">2</span><span class="s2">, </span><span class="s1">statut</span><span class="s2">);</span>
+            <span class="s1">stmt</span><span class="s2">.</span><span class="s1">setInt</span><span class="s2">(</span><span class="s5">3</span><span class="s2">, </span><span class="s1">clientId</span><span class="s2">);</span>
+
+            <span class="s0">int </span><span class="s1">affectedRows </span><span class="s2">= </span><span class="s1">stmt</span><span class="s2">.</span><span class="s1">executeUpdate</span><span class="s2">();</span>
+
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">affectedRows </span><span class="s2">== </span><span class="s5">0</span><span class="s2">) {</span>
+                <span class="s0">throw new </span><span class="s1">SQLException</span><span class="s2">(</span><span class="s3">&quot;Creating commande failed, no rows affected.&quot;</span><span class="s2">);</span>
+            <span class="s2">}</span>
+
+            <span class="s0">try </span><span class="s2">(</span><span class="s1">ResultSet generatedKeys </span><span class="s2">= </span><span class="s1">stmt</span><span class="s2">.</span><span class="s1">getGeneratedKeys</span><span class="s2">()) {</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">generatedKeys</span><span class="s2">.</span><span class="s1">next</span><span class="s2">()) {</span>
+                    <span class="s0">int </span><span class="s1">commandeId </span><span class="s2">= </span><span class="s1">generatedKeys</span><span class="s2">.</span><span class="s1">getInt</span><span class="s2">(</span><span class="s5">1</span><span class="s2">);</span>
+                    <span class="s1">System</span><span class="s2">.</span><span class="s1">out</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s3">&quot;Commande créée avec l'ID : &quot; </span><span class="s2">+ </span><span class="s1">commandeId</span><span class="s2">);</span>
+                    <span class="s0">return true</span><span class="s2">;</span>
+                <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                    <span class="s0">throw new </span><span class="s1">SQLException</span><span class="s2">(</span><span class="s3">&quot;Creating commande failed, no ID obtained.&quot;</span><span class="s2">);</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+        <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">SQLException e</span><span class="s2">) {</span>
+            <span class="s1">e</span><span class="s2">.</span><span class="s1">printStackTrace</span><span class="s2">();</span>
+        <span class="s2">}</span>
+        <span class="s0">return false</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public boolean </span><span class="s1">updateCommande</span><span class="s2">(</span><span class="s0">int </span><span class="s1">id</span><span class="s2">, </span><span class="s0">int </span><span class="s1">newClientId</span><span class="s2">, </span><span class="s0">int </span><span class="s1">newArticleId</span><span class="s2">, </span><span class="s1">Date date</span><span class="s2">, </span><span class="s1">String newStatut</span><span class="s2">) {</span>
+        <span class="s1">String query </span><span class="s2">= </span><span class="s3">&quot;UPDATE commandes SET ID_Utilisateur = ?, ID_Client = ?, Date = ?, Statut = ? WHERE ID = ?&quot;</span><span class="s2">;</span>
+        <span class="s0">try </span><span class="s2">(</span><span class="s1">PreparedStatement stmt </span><span class="s2">= </span><span class="s1">connection</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s1">query</span><span class="s2">)) {</span>
+            <span class="s1">stmt</span><span class="s2">.</span><span class="s1">setInt</span><span class="s2">(</span><span class="s5">1</span><span class="s2">, </span><span class="s1">newClientId</span><span class="s2">);</span>
+            <span class="s1">stmt</span><span class="s2">.</span><span class="s1">setInt</span><span class="s2">(</span><span class="s5">2</span><span class="s2">, </span><span class="s1">newArticleId</span><span class="s2">);</span>
+            <span class="s1">stmt</span><span class="s2">.</span><span class="s1">setDate</span><span class="s2">(</span><span class="s5">3</span><span class="s2">, </span><span class="s0">new </span><span class="s1">java</span><span class="s2">.</span><span class="s1">sql</span><span class="s2">.</span><span class="s1">Date</span><span class="s2">(</span><span class="s1">date</span><span class="s2">.</span><span class="s1">getTime</span><span class="s2">()));</span>
+            <span class="s1">stmt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s5">4</span><span class="s2">, </span><span class="s1">newStatut</span><span class="s2">); </span><span class="s4">// Mettre à jour le statut ici</span>
+            <span class="s1">stmt</span><span class="s2">.</span><span class="s1">setInt</span><span class="s2">(</span><span class="s5">5</span><span class="s2">, </span><span class="s1">id</span><span class="s2">); </span><span class="s4">// ID de la commande à mettre à jour</span>
+            <span class="s1">stmt</span><span class="s2">.</span><span class="s1">executeUpdate</span><span class="s2">();</span>
+            <span class="s0">return true</span><span class="s2">; </span><span class="s4">// Retourne true si la mise à jour a réussi</span>
+        <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">SQLException e</span><span class="s2">) {</span>
+            <span class="s1">e</span><span class="s2">.</span><span class="s1">printStackTrace</span><span class="s2">();</span>
+        <span class="s2">}</span>
+        <span class="s0">return false</span><span class="s2">; </span><span class="s4">// Retourne false en cas d'erreur</span>
+    <span class="s2">}</span>
+
+    <span class="s4">// Méthode pour supprimer une commande</span>
+    <span class="s0">public boolean </span><span class="s1">deleteCommande</span><span class="s2">(</span><span class="s0">int </span><span class="s1">id</span><span class="s2">) {</span>
+        <span class="s1">String query </span><span class="s2">= </span><span class="s3">&quot;DELETE FROM commandes WHERE ID = ?&quot;</span><span class="s2">;</span>
+
+        <span class="s0">try </span><span class="s2">(</span><span class="s1">PreparedStatement stmt </span><span class="s2">= </span><span class="s1">connection</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s1">query</span><span class="s2">)) {</span>
+            <span class="s1">stmt</span><span class="s2">.</span><span class="s1">setInt</span><span class="s2">(</span><span class="s5">1</span><span class="s2">, </span><span class="s1">id</span><span class="s2">);</span>
+            <span class="s1">stmt</span><span class="s2">.</span><span class="s1">executeUpdate</span><span class="s2">();</span>
+            <span class="s0">return true</span><span class="s2">; </span><span class="s4">// Retourne true si la suppression a réussi</span>
+        <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">SQLException e</span><span class="s2">) {</span>
+            <span class="s1">e</span><span class="s2">.</span><span class="s1">printStackTrace</span><span class="s2">();</span>
+        <span class="s2">}</span>
+        <span class="s0">return false</span><span class="s2">; </span><span class="s4">// Retourne false en cas d'erreur</span>
+    <span class="s2">}</span>
+    <span class="s0">public boolean </span><span class="s1">clientExists</span><span class="s2">(</span><span class="s0">int </span><span class="s1">clientId</span><span class="s2">) {</span>
+        <span class="s1">String query </span><span class="s2">= </span><span class="s3">&quot;SELECT COUNT(*) FROM clients WHERE ID = ?&quot;</span><span class="s2">;</span>
+        <span class="s0">try </span><span class="s2">(</span><span class="s1">PreparedStatement stmt </span><span class="s2">= </span><span class="s1">connection</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s1">query</span><span class="s2">)) {</span>
+            <span class="s1">stmt</span><span class="s2">.</span><span class="s1">setInt</span><span class="s2">(</span><span class="s5">1</span><span class="s2">, </span><span class="s1">clientId</span><span class="s2">);</span>
+            <span class="s1">ResultSet rs </span><span class="s2">= </span><span class="s1">stmt</span><span class="s2">.</span><span class="s1">executeQuery</span><span class="s2">();</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">rs</span><span class="s2">.</span><span class="s1">next</span><span class="s2">()) {</span>
+                <span class="s0">return </span><span class="s1">rs</span><span class="s2">.</span><span class="s1">getInt</span><span class="s2">(</span><span class="s5">1</span><span class="s2">) &gt; </span><span class="s5">0</span><span class="s2">; </span><span class="s4">// Retourne true si le client existe</span>
+            <span class="s2">}</span>
+        <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">SQLException e</span><span class="s2">) {</span>
+            <span class="s1">e</span><span class="s2">.</span><span class="s1">printStackTrace</span><span class="s2">();</span>
+        <span class="s2">}</span>
+        <span class="s0">return false</span><span class="s2">; </span><span class="s4">// Retourne false en cas d'erreur</span>
+    <span class="s2">}</span>
+<span class="s2">}</span></pre>
+</body>
+</html>
