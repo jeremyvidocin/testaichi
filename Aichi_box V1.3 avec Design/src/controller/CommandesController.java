@@ -45,7 +45,7 @@ public class CommandesController {
             Date date = new Date(System.currentTimeMillis()); // Date actuelle
 
             // Appel à la méthode addCommande sans quantité
-            if (commandeDAO.addCommande(clientId, date, statut)) {
+            if (commandeDAO.addCommande(clientId, articleId, date, statut)) {
                 JOptionPane.showMessageDialog(commandesView, "Commande ajoutée !");
                 loadCommandes(); // Recharge les commandes
             } else {

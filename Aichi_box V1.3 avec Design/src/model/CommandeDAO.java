@@ -21,6 +21,7 @@ public class CommandeDAO {
             while (rs.next()) {
                 commandes.add(new Commande(
                         rs.getInt("ID"),
+                        rs.getInt("ID_Utilisateur"),
                         rs.getInt("ID_Client"),
                         rs.getDate("Date"),
                         rs.getString("Statut")
@@ -33,33 +34,20 @@ public class CommandeDAO {
         return commandes;
     }
 
-    public boolean addCommande(int clientId, Date date, String statut) {
-        String query = "INSERT INTO commandes (Date, Statut, ID_Client) VALUES (?, ?, ?)";
+    public boolean addCommande(int clientId, int articleId, Date date, String statut) {
+        String query = "INSERT INTO commandes (ID_Utilisateur, ID_Client, Date, Statut) VALUES (?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setDate(1, new java.sql.Date(date.getTime()));
-            stmt.setString(2, statut);
-            stmt.setInt(3, clientId);
-
-            int affectedRows = stmt.executeUpdate();
-
-            if (affectedRows == 0) {
-                throw new SQLException("Creating commande failed, no rows affected.");
-            }
-
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    int commandeId = generatedKeys.getInt(1);
-                    System.out.println("Commande créée avec l'ID : " + commandeId);
-                    return true;
-                } else {
-                    throw new SQLException("Creating commande failed, no ID obtained.");
-                }
-            }
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, clientId);
+            stmt.setInt(2, articleId);
+            stmt.setDate(3, new java.sql.Date(date.getTime()));
+            stmt.setString(4, statut); // Assurez-vous d'ajouter le statut ici
+            stmt.executeUpdate();
+            return true; // Retourne true si l'ajout a réussi
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+        return false; // Retourne false en cas d'erreur
     }
 
     public boolean updateCommande(int id, int newClientId, int newArticleId, Date date, String newStatut) {
